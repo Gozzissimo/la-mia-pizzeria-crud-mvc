@@ -64,6 +64,7 @@ namespace la_mia_pizzeria_static.Controllers
             return View("ShowPizza", nuovaPizza);
         }
 
+        //VIEW DELLA UPDATE
         [HttpGet]
         public IActionResult UpdatePizza(int id)
         {
@@ -78,6 +79,43 @@ namespace la_mia_pizzeria_static.Controllers
                 ViewData["nomePizzeria"] = pizzeria.Nome;
                 return View(pizzaDaModificare);
             }
+        }
+
+        //METODO PER UPDATARE LE PIZZE
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Update(int id, Pizza modello)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("UpdatePizza", modello);
+            }
+
+            Pizza? pizzaDaModificare = pizzeria.listaPizze.Find(item => item.Id == id);
+
+            if (pizzaDaModificare != null)
+            {
+                //aggiorniamo i campi con i nuovi valori
+                pizzaDaModificare.Name = modello.Name;
+                pizzaDaModificare.Description = modello.Description;
+                pizzaDaModificare.Price = modello.Price;
+            }
+            else
+            {
+                ViewData["Titolo"] = "Pizza Not Found!";
+                return View("PizzaNotFound");
+            }
+
+            return RedirectToAction("ShowPizza");
+        }
+
+        [HttpGet]
+        public IActionResult Delete(int id)
+        {
+            Pizza? pizzaDaRimuovere = pizzeria.listaPizze.Find(item => item.Id == id);
+
+            pizzeria.listaPizze.Remove(pizzaDaRimuovere);
+            return RedirectToAction("Index");
         }
     }
 }
